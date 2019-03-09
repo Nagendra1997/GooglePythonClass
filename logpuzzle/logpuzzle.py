@@ -32,8 +32,9 @@ def read_urls(filename):
   	  if puzzle_url:
   	  	  if puzzle_url.group(1) not in puzzle_url_list:
   	  	  	  puzzle_url_list.append(puzzle_url.group(1))
-  	  	  
-  puzzle_url_list.sort()
+  
+  	  
+  puzzle_url_list.sort(key=find_anything_special)
   server_name='http://'
   server_name_search=re.search(r'_(\S+)',filename)
   if server_name_search:
@@ -42,9 +43,9 @@ def read_urls(filename):
   	  
   for i,each_url in enumerate(puzzle_url_list):
   	  puzzle_url_list[i]=server_name+each_url
-  	  
-  print puzzle_url_list[:5]
-  sys.exit(0)
+  
+  return puzzle_url_list
+  
   
   
 
@@ -57,9 +58,48 @@ def download_images(img_urls, dest_dir):
   Creates the directory if necessary.
   """
   # +++your code here+++
+  if not os.path.exists(dest_dir):
+  	  os.mkdir(dest_dir)
+  
+  for i,url_id in enumerate(img_urls):
+  	  file_name='img'+str(i)
+  	  file_dir_path=os.path.join(dest_dir,file_name)
+  	  print 'retrieveing img'+str(i)
+  	  urllib.urlretrieve(url_id,file_dir_path)
+  	 
+  create_indexfile(dest_dir)
   
 
+def find_img_id(img_name):
+	return int(img_name[3:])
+	
+def find_anything_special(url_id):
+	match=re.search(r'-\w+-(\w+).jpg',url_id)
+	if match:
+		return match.group(1)
+	else:
+		return url_id[0]
+		
+def create_indexfile(dest_dir):
+	dest_dir='/home/nagendra/gpe/logpuzzle/secretimage'
+	img_file_list=os.listdir(dest_dir)
+	img_file_list.sort(key=find_img_id)
+	
+	#Descrambling
+	
+	
+	f=open(dest_dir+'index.html','w')
+	f.write('<verbatim>\n<html>\n<body>\n')
+	
+	for file_name in img_file_list:
+		f.write('<img src="'+dest_dir+'/'+file_name+'">')
+	f.close()
+	
+	
+	
+	
 def main():
+  
   args = sys.argv[1:]
 
   if not args:

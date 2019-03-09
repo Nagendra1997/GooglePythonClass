@@ -25,6 +25,27 @@ def read_urls(filename):
   Screens out duplicate urls and returns the urls sorted into
   increasing order."""
   # +++your code here+++
+  puzzle_url_list=[]
+  f=open(filename,'r')
+  for line in f:
+  	  puzzle_url=re.search(r'GET (\S+/puzzle/\S+) HTTP',line)
+  	  if puzzle_url:
+  	  	  if puzzle_url.group(1) not in puzzle_url_list:
+  	  	  	  puzzle_url_list.append(puzzle_url.group(1))
+  	  	  
+  puzzle_url_list.sort()
+  server_name='http://'
+  server_name_search=re.search(r'_(\S+)',filename)
+  if server_name_search:
+  	  server_name+=server_name_search.group(1)
+
+  	  
+  for i,each_url in enumerate(puzzle_url_list):
+  	  puzzle_url_list[i]=server_name+each_url
+  	  
+  print puzzle_url_list[:5]
+  sys.exit(0)
+  
   
 
 def download_images(img_urls, dest_dir):
